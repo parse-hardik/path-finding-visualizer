@@ -1,0 +1,44 @@
+.grid {
+  text-align: center;
+  margin: 75px 0 0;
+}
+
+.container {
+  width: 200px;
+  height: 50px;
+  position: fixed;
+  row-gap: 20px;
+  border: 3px solid green;
+  /* padding-bottom: 10px ; */
+}
+
+.vertical-center {
+  margin-bottom: 10px ;
+  /* margin-top: 0px; */
+  /* position: absolute; */
+  left: 45%;
+  /* top: 10%; */
+  bottom: 88%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.bg-custom-1 {
+  background-color: #85144b;
+}
+
+.bg-custom-2 {
+background-image: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
+}
+
+.cwhite {
+  color: aliceblue;
+}
+
+.fsize {
+  font-size: 20px;
+}
+
+.pad{
+  margin-left: 10px;
+}
