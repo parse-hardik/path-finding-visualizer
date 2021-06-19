@@ -17,9 +17,9 @@ export default function Algo(grid, start, end){
 			return visitedNodes;
 		closest.visited = true;
 		visitedNodes.push(closest);
+		updateNeighbors(grid, closest);
 		if(closest === end)
 			return visitedNodes;
-		updateNeighbors(grid, closest);
 	}
 }
 
@@ -35,7 +35,7 @@ export function getShortestPath(allNodes, start){
 	const shortestPath = [];
 	let curr = allNodes[allNodes.length-1];
 	curr = curr.prev;
-	while(curr!==start){
+	while(curr!==start ){
 		shortestPath.push(curr);
 		curr = curr.prev;
 	}

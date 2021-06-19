@@ -3,20 +3,43 @@
   margin: 75px 0 0;
 }
 
+.node {
+  width: 25px;
+  height: 25px;
+  outline: 2px solid rgb(175, 216, 248);
+  display: inline-block;
+}
+
+.node-start {
+  background-image: url("./logos/start.jpg");
+  background-size: 24px 24px;
+  /* background-color: green; */
+}
+
+.node-end {
+  background-image: url("./logos/end.png");
+  background-size: 24px 24px;
+  /* background-color: red; */
+}
+
 .container {
   width: 200px;
   height: 50px;
   position: fixed;
   row-gap: 20px;
-  border: 3px solid green;
   /* padding-bottom: 10px ; */
+}
+
+.container:hover{
+  border: 3px solid green;
 }
 
 .vertical-center {
   margin-bottom: 10px ;
   /* margin-top: 0px; */
   /* position: absolute; */
-  left: 45%;
+  left: 35%;
+  top: 4.5%;
   /* top: 10%; */
   bottom: 88%;
   -ms-transform: translateY(-50%);
@@ -36,9 +59,38 @@ background-image: linear-gradient(15deg, #13547a 0%, #80d0c7 100%);
 }
 
 .fsize {
-  font-size: 20px;
+  font-size: 15px;
 }
 
 .pad{
+  margin-left: 15px;
+  font-size: 20px;
+}
+
+.algo{
   margin-left: 10px;
+}
+
+.clear-board{
+  margin-bottom: 10px ;
+  /* margin-top: 0px; */
+  /* position: absolute; */
+  left: 55%;
+  top: 4.5%;
+  /* top: 10%; */
+  bottom: 88%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.clear-path{
+  margin-bottom: 10px ;
+  /* margin-top: 0px; */
+  /* position: absolute; */
+  left: 75%;
+  top: 4.5%;
+  /* top: 10%; */
+  bottom: 88%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 }
