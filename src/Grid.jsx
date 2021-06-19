@@ -17,6 +17,7 @@ export default class PathFinder extends Component {
       end: END,
 			startNodePressed: false,
 			endNodePressed: false,
+      changingWallAllowed: true,
     };
   }
 
@@ -42,8 +43,8 @@ export default class PathFinder extends Component {
     for (let i = 0; i < allNodes.length; i++) {
       const node = allNodes[i];
       if (
-        !(node.row === END[0] && node.col === END[1]) &&
-        !(node.row === START[0] && node.col === START[1])
+        !(node.row === this.state.end[0] && node.col === this.state.end[1]) &&
+        !(node.row === this.state.start[0] && node.col === this.state.start[1])
       )
         setTimeout(() => {
           document.getElementById(`node-${node.row}-${node.col}`).className =
@@ -51,8 +52,8 @@ export default class PathFinder extends Component {
         }, 10 * i);
       if (
         i === allNodes.length - 1 &&
-        last.row === END[0] &&
-        last.col === END[1]
+        last.row === this.state.end[0] &&
+        last.col === this.state.end[1]
       ) {
         setTimeout(() => {
           this.animateShortestPath(shortestPath);
@@ -73,6 +74,7 @@ export default class PathFinder extends Component {
 
   visuaizeAlgorithm() {
     const { grid } = this.state;
+    // console.log('grid', grid)
 		console.log('start', this.state.start)
 		console.log('end', this.state.end)
     const start = grid[this.state.start[0]][this.state.start[1]];
@@ -99,7 +101,7 @@ export default class PathFinder extends Component {
       "node node-start";
     document.getElementById(`node-${END[0]}-${END[1]}`).className =
       "node node-end";
-    this.setState({ grid: grid });
+    this.setState({ grid: grid, start:START, end: END });
   }
 
   clearPath() {
@@ -126,24 +128,36 @@ export default class PathFinder extends Component {
 
   onMouseEnter(row, col) {
     if (this.state.mouseDown === false) return;
-		if(this.state.startNodePressed === true){
-			document.getElementById(`node-${row}-${col}`).className = "node node-start";
+    const { grid } = this.state;
+		if(this.state.startNodePressed === true && grid[row][col].isWall === false){
+      console.log('Line 132, row: ',row, ' col: ',col, 'grid', grid[row][col])
 			this.setState({start: [row, col]}, () =>{
 				console.log('LINE 152 ', this.state.start)
 			})
-			
+			document.getElementById(`node-${row}-${col}`).className = "node node-start";
+      console.log('grid', grid)
 		}
-    const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
-    this.setState({ grid: newGrid, mouseDown: true });
+    else if(this.state.startNodePressed === false){
+      const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
+      this.setState({ grid: newGrid, mouseDown: true });
+    }
   }
 
 	onMouseLeave(row, col) {
 		if (this.state.startNodePressed === false && this.state.endNodePressed === false) return;
-		if(
-			(row === this.state.start[0] && col === this.state.start[1]) ||
-			(row === this.state.end[0] && col === this.state.end[1])
-		)
-			document.getElementById(`node-${row}-${col}`).className = "node";
+		// if(
+		// 	(row === this.state.start[0] && col === this.state.start[1]) ||
+		// 	(row === this.state.end[0] && col === this.state.end[1])
+		// )
+    const {grid} = this.state;
+    if(grid[row][col].isWall === true && this.state.changingWallAllowed === false) return;
+    document.getElementById(`node-${row}-${col}`).className = "node";
+    // console.log('here')
+    grid[row][col].isWall = false;
+    grid[row][col].prev = null;
+    grid[row][col].distance = Infinity;
+    grid[row][col].visited = false;
+    this.setState({ grid: grid});
 	}
 
   onMouseDown(row, col) {
@@ -160,19 +174,26 @@ export default class PathFinder extends Component {
 			this.setState({startNodePressed: true}, ()=>{
 				console.log('startNodePressed set to true')
 			});
+      this.setState({changingWallAllowed: false})
 		}
-		else if(row === this.state.end[0] && col === this.state.end[1])
-			this.setState({endNodePressed: true}, ()=>{
+		else if(row === this.state.end[0] && col === this.state.end[1]){
+      this.setState({endNodePressed: true}, ()=>{
 				console.log('endNodePressed set to true')
 			});
+      this.setState({changingWallAllowed: false})
+    }
     this.setState({ mouseDown: true });
   }
 
   onMouseUp(row, col) {
-		if( row === this.state.start[0] && col === this.state.start[1] )
-			this.setState({startNodePressed: false});
-		else if(row === this.state.end[0] && col === this.state.end[1])
-			this.setState({endNodePressed: false});
+		if( row === this.state.start[0] && col === this.state.start[1] ){
+      this.setState({startNodePressed: false});
+      this.setState({changingWallAllowed: true})
+    }
+		else if(row === this.state.end[0] && col === this.state.end[1]){
+      this.setState({endNodePressed: false});
+      this.setState({changingWallAllowed: true})
+    }
     this.setState({ mouseDown: false });
   }
 
@@ -244,8 +265,8 @@ export default class PathFinder extends Component {
                 {row.map((node, nodeIdx) => {
                   const { row, col, isWall } = node;
                   const isStart =
-                    row === START[0] && col === START[1] ? true : false;
-                  const isEnd = row === END[0] && col === END[1] ? true : false;
+                    row === this.state.start[0] && col === this.state.start[1] ? true : false;
+                  const isEnd = row === this.state.end[0] && col === this.state.end[1] ? true : false;
                   return (
                     <Node
                       row={row}
