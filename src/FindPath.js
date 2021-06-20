@@ -14,8 +14,8 @@ function AStar(grid, start, end){
 	open.push(start);
 	// const dx = [-1,-1,-1,0,0,1,1,1];
 	// const dy = [-1,0,1,-1,1,-1,0,1];
-	const dx = [-1,0,0,1];
-	const dy = [0,-1,1,0];
+	const dx = [0,1,0,-1];
+	const dy = [1,0,-1,0];
 	let gNew, hNew, fNew;
 	while(open.length){
 		sortNodesByF(open);
