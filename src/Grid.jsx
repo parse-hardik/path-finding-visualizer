@@ -18,6 +18,7 @@ export default class PathFinder extends Component {
 			startNodePressed: false,
 			endNodePressed: false,
       changingWallAllowed: true,
+      algorithm: '',
     };
   }
 
@@ -37,6 +38,10 @@ export default class PathFinder extends Component {
       grid.push(curr);
     }
     return grid;
+  }
+
+  setAlgo(name){
+    this.setState({algorithm: name})
   }
 
   animateAlgorithm(allNodes, shortestPath, last) {
@@ -79,10 +84,14 @@ export default class PathFinder extends Component {
 		console.log('end', this.state.end)
     const start = grid[this.state.start[0]][this.state.start[1]];
     const end = grid[this.state.end[0]][this.state.end[1]];
-    const allNodes = Algo(grid, start, end);
+    if(this.state.algorithm === '')
+      return;
+    console.log('algorithm', this.state.algorithm )
+    const allNodes = Algo(grid, start, end, this.state.algorithm);
     const last = allNodes[allNodes.length - 1];
     console.log(allNodes);
     const shortestPath = getShortestPath(allNodes, start);
+    console.log(shortestPath)
     this.animateAlgorithm(allNodes, shortestPath, last);
   }
 
@@ -94,6 +103,9 @@ export default class PathFinder extends Component {
         grid[row][col].distance = Infinity;
         grid[row][col].visited = false;
         grid[row][col].prev = null;
+        grid[row][col].f = Infinity;
+        grid[row][col].g = Infinity;
+        grid[row][col].heuristic = Infinity;
         document.getElementById(`node-${row}-${col}`).className = "node";
       }
     }
@@ -112,6 +124,9 @@ export default class PathFinder extends Component {
 				grid[row][col].prev = null;
 				grid[row][col].distance = Infinity;
 				grid[row][col].visited = false;
+        grid[row][col].f = Infinity;
+        grid[row][col].g = Infinity;
+        grid[row][col].heuristic = Infinity;
         if (
           (row === this.state.start[0] && col === this.state.start[1]) ||
           (row === this.state.end[0] && col === this.state.end[1]) || grid[row][col].isWall === true
@@ -203,6 +218,13 @@ export default class PathFinder extends Component {
     this.setState({ mouseDown: false });
   }
 
+  presentable(){
+    if(this.state.algorithm === 'Dijkstra')
+      return 'Dijstra\'s!'
+    if(this.state.algorithm === 'AStar')
+      return 'A* Search!'
+  }
+
   render() {
     const { grid } = this.state;
     return (
@@ -232,11 +254,11 @@ export default class PathFinder extends Component {
                   class="dropdown-menu bg-dark"
                   aria-labelledby="navbarDropdownMenuLink"
                 >
-                  <a class="dropdown-item cwhite" href="#">
+                  <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('Dijkstra')}>
                     Dijkstra
                   </a>
-                  <a class="dropdown-item cwhite" href="#">
-                    A Star
+                  <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('AStar')}>
+                    A* Search
                   </a>
                   <a class="dropdown-item cwhite" href="#">
                     Something else here
@@ -250,13 +272,13 @@ export default class PathFinder extends Component {
           className="container vertical-center bg-dark cwhite fsize"
           onClick={() => this.visuaizeAlgorithm()}
         >
-          Visualize!
+          Visualize {this.presentable()}
         </button>
         <button
           className="container clear-board bg-dark cwhite fsize"
           onClick={() => this.clearBoard()}
         >
-          Clear Board
+          Clear Board 
         </button>
         <button
           className="container clear-path bg-dark cwhite fsize"
@@ -303,6 +325,9 @@ const getNode = (row, col) => {
     visited: false,
     prev: null,
     isWall: false,
+    f: Infinity, 
+    g: Infinity, 
+    heuristic: Infinity,
   };
 };
 
