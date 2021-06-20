@@ -137,7 +137,13 @@ export default class PathFinder extends Component {
 			document.getElementById(`node-${row}-${col}`).className = "node node-start";
       console.log('grid', grid)
 		}
-    else if(this.state.startNodePressed === false){
+    else if(this.state.endNodePressed === true && grid[row][col].isWall === false){
+      this.setState({end: [row, col]}, () =>{
+				// console.log('LINE 152 ', this.state.start)
+			})
+			document.getElementById(`node-${row}-${col}`).className = "node node-end";
+    }
+    else if(this.state.startNodePressed === false && this.state.endNodePressed === false){
       const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
       this.setState({ grid: newGrid, mouseDown: true });
     }
