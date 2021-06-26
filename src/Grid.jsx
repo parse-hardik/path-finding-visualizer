@@ -225,6 +225,8 @@ export default class PathFinder extends Component {
       return 'A* Search!'
     if(this.state.algorithm === 'BFS')
       return 'BFS!'
+    if(this.state.algorithm === 'DFS')
+      return 'DFS!'
   }
 
   render() {
@@ -264,6 +266,9 @@ export default class PathFinder extends Component {
                   </a>
                   <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('BFS')}>
                     BFS
+                  </a>
+                  <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('DFS')}>
+                    DFS
                   </a>
                 </div>
               </li>

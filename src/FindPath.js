@@ -7,6 +7,41 @@ export default function Algo(grid, start, end, name){
 		return AStar(grid, start, end)
 	if(name === 'BFS')
 		return BFS(grid, start, end)
+	if(name === 'DFS')
+		return DFS(grid, start, end)
+}
+
+const dx = [0,1,0,-1];
+const dy = [1,0,-1,0];
+
+function DFSUtil(grid, curr, target, visitedNodes){
+	if(!isValid(grid, curr.row, curr.col) || curr.visited || curr.isWall)
+		return false;
+	if(curr==target){
+		visitedNodes.push(curr);
+		return true;
+	}
+	curr.visited = true;
+	visitedNodes.push(curr);
+	for(let i=0;i<dx.length;i++){
+		const x = curr.row + dx[i];
+		const y = curr.col + dy[i];
+		if(!isValid(grid, x, y) )
+			continue;
+		const next = grid[x][y];
+		if(next.visited === true || next.isWall === true)
+			continue;
+		next.prev = curr;
+		if(DFSUtil(grid, next, target, visitedNodes)) 
+			return true;
+	}
+	return false;
+}
+
+function DFS(grid, start, end){
+	const visitedNodes = []
+	DFSUtil(grid, start, end, visitedNodes);
+	return visitedNodes;
 }
 
 function BFS(grid, start, end){
