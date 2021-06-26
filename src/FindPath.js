@@ -1,8 +1,42 @@
+import Queue from './Queue'
+
 export default function Algo(grid, start, end, name){
 	if(name === 'Dijkstra')
 		return dijkstra(grid, start, end)
 	if(name === 'AStar')
 		return AStar(grid, start, end)
+	if(name === 'BFS')
+		return BFS(grid, start, end)
+}
+
+function BFS(grid, start, end){
+	start.distance = 0;
+	const visitedNodes = []
+	const q = new Queue();
+	q.push(start);
+	const dx = [0,1,0,-1];
+	const dy = [1,0,-1,0];
+	while(!q.isEmpty()){
+		const curr = q.front();
+		q.pop();
+		if(curr.visited === true || curr.isWall === true)
+			continue;
+		curr.visited = true;
+		visitedNodes.push(curr);
+		if(curr === end)
+			return visitedNodes;
+		for(let i=0;i<dx.length;i++){
+			const x = curr.row + dx[i];
+			const y = curr.col + dy[i];
+			if(!isValid(grid, x, y))
+				continue;
+			const next = grid[x][y];
+			if(next.visited === true)
+				continue;
+			next.prev = curr;
+			q.push(next);
+		}
+	}
 }
 
 function AStar(grid, start, end){
@@ -101,6 +135,7 @@ export function getShortestPath(allNodes, start){
 	curr = curr.prev;
 	while(curr!==start ){
 		shortestPath.push(curr);
+		console.log(curr);
 		curr = curr.prev;
 	}
 	// shortestPath.push(start);

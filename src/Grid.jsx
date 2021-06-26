@@ -223,6 +223,8 @@ export default class PathFinder extends Component {
       return 'Dijstra\'s!'
     if(this.state.algorithm === 'AStar')
       return 'A* Search!'
+    if(this.state.algorithm === 'BFS')
+      return 'BFS!'
   }
 
   render() {
@@ -260,8 +262,8 @@ export default class PathFinder extends Component {
                   <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('AStar')}>
                     A* Search
                   </a>
-                  <a class="dropdown-item cwhite" href="#">
-                    Something else here
+                  <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('BFS')}>
+                    BFS
                   </a>
                 </div>
               </li>
