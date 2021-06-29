@@ -17,7 +17,7 @@ const dy = [1,0,-1,0];
 function DFSUtil(grid, curr, target, visitedNodes){
 	if(!isValid(grid, curr.row, curr.col) || curr.visited || curr.isWall)
 		return false;
-	if(curr==target){
+	if(curr===target){
 		visitedNodes.push(curr);
 		return true;
 	}
