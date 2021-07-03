@@ -1,72 +1,95 @@
 import Queue from './Queue'
 
-export default function Algo(grid, start, end, name){
-	if(name === 'Dijkstra')
+export default function Algo(grid, start, end, name) {
+	if (name === 'Dijkstra')
 		return dijkstra(grid, start, end)
-	if(name === 'AStar')
+	if (name === 'AStar')
 		return AStar(grid, start, end)
-	if(name === 'BFS')
+	if (name === 'BFS')
 		return BFS(grid, start, end)
-	if(name === 'DFS')
+	if (name === 'DFS')
 		return DFS(grid, start, end)
+	if (name === 'GBFS')
+		return GreedyBFS(grid, start, end)
 }
 
-const dx = [0,1,0,-1];
-const dy = [1,0,-1,0];
+const dx = [0, 1, 0, -1];
+const dy = [1, 0, -1, 0];
 
-function DFSUtil(grid, curr, target, visitedNodes){
-	if(!isValid(grid, curr.row, curr.col) || curr.visited || curr.isWall)
+function GreedyBFS(grid, start, end) {
+	start.distance = 0;
+	const visitedNodes = []
+	const allNodes = [];
+	for (const row of grid) {
+		for (const col of row)
+			allNodes.push(col);
+	}
+	while (allNodes.length) {
+		sortNodesByDistance(allNodes);
+		const closest = allNodes.shift();
+		if (closest.isWall)
+			continue;
+		if (closest.distance === Infinity)
+			return visitedNodes;
+		closest.visited = true;
+		visitedNodes.push(closest);
+		updateHeuristicNeighbors(grid, closest, end);
+		if (closest === end)
+			return visitedNodes;
+	}
+}
+
+function DFSUtil(grid, curr, target, visitedNodes) {
+	if (!isValid(grid, curr.row, curr.col) || curr.visited || curr.isWall)
 		return false;
-	if(curr===target){
+	if (curr === target) {
 		visitedNodes.push(curr);
 		return true;
 	}
 	curr.visited = true;
 	visitedNodes.push(curr);
-	for(let i=0;i<dx.length;i++){
+	for (let i = 0; i < dx.length; i++) {
 		const x = curr.row + dx[i];
 		const y = curr.col + dy[i];
-		if(!isValid(grid, x, y) )
+		if (!isValid(grid, x, y))
 			continue;
 		const next = grid[x][y];
-		if(next.visited === true || next.isWall === true)
+		if (next.visited === true || next.isWall === true)
 			continue;
 		next.prev = curr;
-		if(DFSUtil(grid, next, target, visitedNodes)) 
+		if (DFSUtil(grid, next, target, visitedNodes))
 			return true;
 	}
 	return false;
 }
 
-function DFS(grid, start, end){
+function DFS(grid, start, end) {
 	const visitedNodes = []
 	DFSUtil(grid, start, end, visitedNodes);
 	return visitedNodes;
 }
 
-function BFS(grid, start, end){
+function BFS(grid, start, end) {
 	start.distance = 0;
 	const visitedNodes = []
 	const q = new Queue();
 	q.push(start);
-	const dx = [0,1,0,-1];
-	const dy = [1,0,-1,0];
-	while(!q.isEmpty()){
+	while (!q.isEmpty()) {
 		const curr = q.front();
 		q.pop();
-		if(curr.visited === true || curr.isWall === true)
+		if (curr.visited === true || curr.isWall === true)
 			continue;
 		curr.visited = true;
 		visitedNodes.push(curr);
-		if(curr === end)
+		if (curr === end)
 			return visitedNodes;
-		for(let i=0;i<dx.length;i++){
+		for (let i = 0; i < dx.length; i++) {
 			const x = curr.row + dx[i];
 			const y = curr.col + dy[i];
-			if(!isValid(grid, x, y))
+			if (!isValid(grid, x, y))
 				continue;
 			const next = grid[x][y];
-			if(next.visited === true)
+			if (next.visited === true)
 				continue;
 			next.prev = curr;
 			q.push(next);
@@ -74,42 +97,42 @@ function BFS(grid, start, end){
 	}
 }
 
-function AStar(grid, start, end){
+function AStar(grid, start, end) {
 	const open = [], visited = [];
-	const closed = new Array(grid.length).fill(false).map(() =>new Array(grid[0].length).fill(false));
-	start.f=0;
-	start.g=0; 
-	start.heurstic=0;
+	const closed = new Array(grid.length).fill(false).map(() => new Array(grid[0].length).fill(false));
+	start.f = 0;
+	start.g = 0;
+	start.heurstic = 0;
 	open.push(start);
 	// const dx = [-1,-1,-1,0,0,1,1,1];
 	// const dy = [-1,0,1,-1,1,-1,0,1];
-	const dx = [0,1,0,-1];
-	const dy = [1,0,-1,0];
+	const dx = [0, 1, 0, -1];
+	const dy = [1, 0, -1, 0];
 	let gNew, hNew, fNew;
-	while(open.length){
+	while (open.length) {
 		sortNodesByF(open);
 		const curr = open.shift();
 		visited.push(curr);
 		closed[curr.row][curr.col] = true;
-		for(let i=0;i<dx.length;i++){
+		for (let i = 0; i < dx.length; i++) {
 			const x = dx[i] + curr.row;
 			const y = dy[i] + curr.col;
-			if(!isValid(grid, x, y))
+			if (!isValid(grid, x, y))
 				continue;
 			const next = grid[x][y];
-			if(next === end){
+			if (next === end) {
 				next.prev = curr;
 				visited.push(next);
 				return visited;
 			}
-			if(closed[x][y] === false && next.isWall === false){
+			if (closed[x][y] === false && next.isWall === false) {
 				gNew = curr.g + 1.0;
 				hNew = calculateHValue(next, end);
 				fNew = gNew + hNew;
-				if(next.f === Infinity || next.f > fNew){
+				if (next.f === Infinity || next.f > fNew) {
 					open.push(next);
 					next.f = fNew;
-					next.g = gNew; 
+					next.g = gNew;
 					next.heurstic = hNew;
 					next.prev = curr;
 				}
@@ -119,56 +142,64 @@ function AStar(grid, start, end){
 	return visited;
 }
 
-function calculateHValue(next, end){
+function calculateHValue(next, end) {
 	const dx = Math.abs(next.row - end.row);
 	const dy = Math.abs(next.col - end.col);
-	return (dx+dy) + (Math.sqrt(2) - 2)*Math.min(dx,dy);
+	return (dx + dy) + (Math.sqrt(2) - 2) * Math.min(dx, dy);
 }
 
-function dijkstra(grid, start, end){
+function dijkstra(grid, start, end) {
 	start.distance = 0;
 	const visitedNodes = [];
 	const allNodes = [];
-	for(const row of grid){
-		for(const col of row)
+	for (const row of grid) {
+		for (const col of row)
 			allNodes.push(col);
 	}
-	while(allNodes.length){
+	while (allNodes.length) {
 		sortNodesByDistance(allNodes);
 		const closest = allNodes.shift();
-		if(closest.isWall){
+		if (closest.isWall) {
 			console.log(closest.row, closest.col);
 			continue;
 		}
-		if(closest.distance === Infinity)
+		if (closest.distance === Infinity)
 			return visitedNodes;
 		closest.visited = true;
 		visitedNodes.push(closest);
 		updateNeighbors(grid, closest);
-		if(closest === end)
+		if (closest === end)
 			return visitedNodes;
 	}
 }
 
-function isValid(grid, row, col){
-	if(row<0 || row>= grid.length || col<0 || col>= grid[0].length)
+function isValid(grid, row, col) {
+	if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length)
 		return false;
 	return true;
 }
 
-function updateNeighbors(grid, curr){
+function updateNeighbors(grid, curr) {
 	const neighbors = getUnvisitedNeighbors(grid, curr);
-	for(const node of neighbors){
-		node.distance = curr.distance+1;
+	for (const node of neighbors) {
+		node.distance = curr.distance + 1;
 		node.prev = curr;
 	}
 }
 
-export function getShortestPath(allNodes, start){
+function updateHeuristicNeighbors(grid, curr, end) {
+	const neighbors = getUnvisitedNeighbors(grid, curr);
+	for (const node of neighbors) {
+		node.distance = calculateHValue(node, end);
+		node.prev = curr;
+	}
+}
+
+export function getShortestPath(allNodes, start) {
 	const shortestPath = [];
-	let curr = allNodes[allNodes.length-1];
-	curr = curr.prev;
-	while(curr!==start ){
+	let curr = allNodes[allNodes.length - 1];
+	// curr = curr.prev;
+	while (curr !== start) {
 		shortestPath.push(curr);
 		console.log(curr);
 		curr = curr.prev;
@@ -178,20 +209,20 @@ export function getShortestPath(allNodes, start){
 	return shortestPath;
 }
 
-function getUnvisitedNeighbors(grid, curr){
+function getUnvisitedNeighbors(grid, curr) {
 	const neighbors = [];
-	const {row, col} = curr;
-	if(row>0) neighbors.push(grid[row-1][col]);
-	if(row<grid.length-1) neighbors.push(grid[row+1][col]);
-	if(col>0) neighbors.push(grid[row][col-1]);
-	if(col<grid[0].length-1) neighbors.push(grid[row][col+1]);
+	const { row, col } = curr;
+	if (row > 0) neighbors.push(grid[row - 1][col]);
+	if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
+	if (col > 0) neighbors.push(grid[row][col - 1]);
+	if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
 	return neighbors.filter(neighbor => !neighbor.visited);
 }
 
 function sortNodesByDistance(unvisitedNodes) {
-  unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
+	unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
 }
 
-function sortNodesByF(openList){
+function sortNodesByF(openList) {
 	openList.sort((nodeA, nodeB) => nodeA.f - nodeB.f)
 }

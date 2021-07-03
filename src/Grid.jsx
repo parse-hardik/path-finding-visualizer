@@ -15,10 +15,10 @@ export default class PathFinder extends Component {
       mouseDown: false,
       start: START,
       end: END,
-			startNodePressed: false,
-			endNodePressed: false,
+      startNodePressed: false,
+      endNodePressed: false,
       changingWallAllowed: true,
-      algorithm: '',
+      algorithm: "",
     };
   }
 
@@ -40,8 +40,8 @@ export default class PathFinder extends Component {
     return grid;
   }
 
-  setAlgo(name){
-    this.setState({algorithm: name})
+  setAlgo(name) {
+    this.setState({ algorithm: name });
   }
 
   animateAlgorithm(allNodes, shortestPath, last) {
@@ -80,18 +80,17 @@ export default class PathFinder extends Component {
   visuaizeAlgorithm() {
     const { grid } = this.state;
     // console.log('grid', grid)
-		console.log('start', this.state.start)
-		console.log('end', this.state.end)
+    console.log("start", this.state.start);
+    console.log("end", this.state.end);
     const start = grid[this.state.start[0]][this.state.start[1]];
     const end = grid[this.state.end[0]][this.state.end[1]];
-    if(this.state.algorithm === '')
-      return;
-    console.log('algorithm', this.state.algorithm )
+    if (this.state.algorithm === "") return;
+    console.log("algorithm", this.state.algorithm);
     const allNodes = Algo(grid, start, end, this.state.algorithm);
     const last = allNodes[allNodes.length - 1];
     console.log(allNodes);
     const shortestPath = getShortestPath(allNodes, start);
-    console.log(shortestPath)
+    console.log(shortestPath);
     this.animateAlgorithm(allNodes, shortestPath, last);
   }
 
@@ -113,7 +112,7 @@ export default class PathFinder extends Component {
       "node node-start";
     document.getElementById(`node-${END[0]}-${END[1]}`).className =
       "node node-end";
-    this.setState({ grid: grid, start:START, end: END });
+    this.setState({ grid: grid, start: START, end: END });
   }
 
   clearPath() {
@@ -121,65 +120,89 @@ export default class PathFinder extends Component {
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         // grid[row][col].isWall = false;
-				grid[row][col].prev = null;
-				grid[row][col].distance = Infinity;
-				grid[row][col].visited = false;
+        grid[row][col].prev = null;
+        grid[row][col].distance = Infinity;
+        grid[row][col].visited = false;
         grid[row][col].f = Infinity;
         grid[row][col].g = Infinity;
         grid[row][col].heuristic = Infinity;
-        if (
-          (row === this.state.start[0] && col === this.state.start[1]) ||
-          (row === this.state.end[0] && col === this.state.end[1]) || grid[row][col].isWall === true
-        )
-          continue;
-        document.getElementById(`node-${row}-${col}`).className = "node";
+        if (grid[row][col].isWall === true) continue;
+        if (row === this.state.start[0] && col === this.state.start[1])
+          document.getElementById(`node-${row}-${col}`).className =
+            "node node-start";
+        else if (row === this.state.end[0] && col === this.state.end[1])
+          document.getElementById(`node-${row}-${col}`).className =
+            "node node-end";
+        else document.getElementById(`node-${row}-${col}`).className = "node";
       }
     }
-    this.setState({ grid: grid }, ()=>{
-			console.log(this.state.grid)
-		});
-		
+    this.setState({ grid: grid }, () => {
+      console.log(this.state.grid);
+    });
   }
 
   onMouseEnter(row, col) {
     if (this.state.mouseDown === false) return;
     const { grid } = this.state;
-		if(this.state.startNodePressed === true && grid[row][col].isWall === false){
-      console.log('Line 132, row: ',row, ' col: ',col, 'grid', grid[row][col])
-			this.setState({start: [row, col]}, () =>{
-				console.log('LINE 152 ', this.state.start)
-			})
-			document.getElementById(`node-${row}-${col}`).className = "node node-start";
-      console.log('grid', grid)
-		}
-    else if(this.state.endNodePressed === true && grid[row][col].isWall === false){
-      this.setState({end: [row, col]}, () =>{
-				// console.log('LINE 152 ', this.state.start)
-			})
-			document.getElementById(`node-${row}-${col}`).className = "node node-end";
-    }
-    else if(this.state.startNodePressed === false && this.state.endNodePressed === false){
+    if (
+      this.state.startNodePressed === true &&
+      grid[row][col].isWall === false
+    ) {
+      console.log(
+        "Line 132, row: ",
+        row,
+        " col: ",
+        col,
+        "grid",
+        grid[row][col]
+      );
+      this.setState({ start: [row, col] }, () => {
+        console.log("LINE 152 ", this.state.start);
+      });
+      document.getElementById(`node-${row}-${col}`).className =
+        "node node-start";
+      console.log("grid", grid);
+    } else if (
+      this.state.endNodePressed === true &&
+      grid[row][col].isWall === false
+    ) {
+      this.setState({ end: [row, col] }, () => {
+        // console.log('LINE 152 ', this.state.start)
+      });
+      document.getElementById(`node-${row}-${col}`).className = "node node-end";
+    } else if (
+      this.state.startNodePressed === false &&
+      this.state.endNodePressed === false
+    ) {
       const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
       this.setState({ grid: newGrid, mouseDown: true });
     }
   }
 
-	onMouseLeave(row, col) {
-		if (this.state.startNodePressed === false && this.state.endNodePressed === false) return;
-		// if(
-		// 	(row === this.state.start[0] && col === this.state.start[1]) ||
-		// 	(row === this.state.end[0] && col === this.state.end[1])
-		// )
-    const {grid} = this.state;
-    if(grid[row][col].isWall === true && this.state.changingWallAllowed === false) return;
+  onMouseLeave(row, col) {
+    if (
+      this.state.startNodePressed === false &&
+      this.state.endNodePressed === false
+    )
+      return;
+    // if(
+    // 	(row === this.state.start[0] && col === this.state.start[1]) ||
+    // 	(row === this.state.end[0] && col === this.state.end[1])
+    // )
+    const { grid } = this.state;
+    if (
+      grid[row][col].isWall === true &&
+      this.state.changingWallAllowed === false
+    )
+      return;
     document.getElementById(`node-${row}-${col}`).className = "node";
     // console.log('here')
     grid[row][col].isWall = false;
     grid[row][col].prev = null;
     grid[row][col].distance = Infinity;
     grid[row][col].visited = false;
-    this.setState({ grid: grid});
-	}
+    this.setState({ grid: grid });
+  }
 
   onMouseDown(row, col) {
     if (
@@ -190,43 +213,37 @@ export default class PathFinder extends Component {
     ) {
       const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
       this.setState({ grid: newGrid });
-    }
-		else if(row === this.state.start[0] && col === this.state.start[1]){
-			this.setState({startNodePressed: true}, ()=>{
-				console.log('startNodePressed set to true')
-			});
-      this.setState({changingWallAllowed: false})
-		}
-		else if(row === this.state.end[0] && col === this.state.end[1]){
-      this.setState({endNodePressed: true}, ()=>{
-				console.log('endNodePressed set to true')
-			});
-      this.setState({changingWallAllowed: false})
+    } else if (row === this.state.start[0] && col === this.state.start[1]) {
+      this.setState({ startNodePressed: true }, () => {
+        console.log("startNodePressed set to true");
+      });
+      this.setState({ changingWallAllowed: false });
+    } else if (row === this.state.end[0] && col === this.state.end[1]) {
+      this.setState({ endNodePressed: true }, () => {
+        console.log("endNodePressed set to true");
+      });
+      this.setState({ changingWallAllowed: false });
     }
     this.setState({ mouseDown: true });
   }
 
   onMouseUp(row, col) {
-		if( row === this.state.start[0] && col === this.state.start[1] ){
-      this.setState({startNodePressed: false});
-      this.setState({changingWallAllowed: true})
-    }
-		else if(row === this.state.end[0] && col === this.state.end[1]){
-      this.setState({endNodePressed: false});
-      this.setState({changingWallAllowed: true})
+    if (row === this.state.start[0] && col === this.state.start[1]) {
+      this.setState({ startNodePressed: false });
+      this.setState({ changingWallAllowed: true });
+    } else if (row === this.state.end[0] && col === this.state.end[1]) {
+      this.setState({ endNodePressed: false });
+      this.setState({ changingWallAllowed: true });
     }
     this.setState({ mouseDown: false });
   }
 
-  presentable(){
-    if(this.state.algorithm === 'Dijkstra')
-      return 'Dijstra\'s!'
-    if(this.state.algorithm === 'AStar')
-      return 'A* Search!'
-    if(this.state.algorithm === 'BFS')
-      return 'BFS!'
-    if(this.state.algorithm === 'DFS')
-      return 'DFS!'
+  presentable() {
+    if (this.state.algorithm === "Dijkstra") return "Dijstra's!";
+    if (this.state.algorithm === "AStar") return "A* Search!";
+    if (this.state.algorithm === "BFS") return "BFS!";
+    if (this.state.algorithm === "DFS") return "DFS!";
+    if (this.state.algorithm === "GBFS") return "Greedy BFS!";
   }
 
   render() {
@@ -258,17 +275,40 @@ export default class PathFinder extends Component {
                   class="dropdown-menu bg-dark"
                   aria-labelledby="navbarDropdownMenuLink"
                 >
-                  <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('Dijkstra')}>
+                  <a
+                    class="dropdown-item cwhite"
+                    href="#"
+                    onClick={() => this.setAlgo("Dijkstra")}
+                  >
                     Dijkstra
                   </a>
-                  <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('AStar')}>
+                  <a
+                    class="dropdown-item cwhite"
+                    href="#"
+                    onClick={() => this.setAlgo("AStar")}
+                  >
                     A* Search
                   </a>
-                  <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('BFS')}>
+                  <a
+                    class="dropdown-item cwhite"
+                    href="#"
+                    onClick={() => this.setAlgo("BFS")}
+                  >
                     BFS
                   </a>
-                  <a class="dropdown-item cwhite" href="#" onClick = {() =>this.setAlgo('DFS')}>
+                  <a
+                    class="dropdown-item cwhite"
+                    href="#"
+                    onClick={() => this.setAlgo("DFS")}
+                  >
                     DFS
+                  </a>
+                  <a
+                    class="dropdown-item cwhite"
+                    href="#"
+                    onClick={() => this.setAlgo("GBFS")}
+                  >
+                    Greedy Best First
                   </a>
                 </div>
               </li>
@@ -285,7 +325,7 @@ export default class PathFinder extends Component {
           className="container clear-board bg-dark cwhite fsize"
           onClick={() => this.clearBoard()}
         >
-          Clear Board 
+          Clear Board
         </button>
         <button
           className="container clear-path bg-dark cwhite fsize"
@@ -300,8 +340,13 @@ export default class PathFinder extends Component {
                 {row.map((node, nodeIdx) => {
                   const { row, col, isWall } = node;
                   const isStart =
-                    row === this.state.start[0] && col === this.state.start[1] ? true : false;
-                  const isEnd = row === this.state.end[0] && col === this.state.end[1] ? true : false;
+                    row === this.state.start[0] && col === this.state.start[1]
+                      ? true
+                      : false;
+                  const isEnd =
+                    row === this.state.end[0] && col === this.state.end[1]
+                      ? true
+                      : false;
                   return (
                     <Node
                       row={row}
@@ -312,7 +357,8 @@ export default class PathFinder extends Component {
                       onMouseEnter={(row, col) => this.onMouseEnter(row, col)}
                       onMouseDown={(row, col) => this.onMouseDown(row, col)}
                       onMouseUp={(row, col) => this.onMouseUp(row, col)}
-											onMouseLeave={(row, col) => this.onMouseLeave(row, col)}/>
+                      onMouseLeave={(row, col) => this.onMouseLeave(row, col)}
+                    />
                   );
                 })}
               </div>
@@ -332,8 +378,8 @@ const getNode = (row, col) => {
     visited: false,
     prev: null,
     isWall: false,
-    f: Infinity, 
-    g: Infinity, 
+    f: Infinity,
+    g: Infinity,
     heuristic: Infinity,
   };
 };
