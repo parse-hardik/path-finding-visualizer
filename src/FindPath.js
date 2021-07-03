@@ -11,10 +11,100 @@ export default function Algo(grid, start, end, name) {
 		return DFS(grid, start, end)
 	if (name === 'GBFS')
 		return GreedyBFS(grid, start, end)
+	if(name === 'BiBFS')
+		return Bi_BFS(grid, start, end)
 }
 
-const dx = [0, 1, 0, -1];
-const dy = [1, 0, -1, 0];
+const dx = [0, 1, -1, 0];
+const dy = [1, 0, 0, -1];
+
+function Bi_BFS(grid, start, end){
+	const sourceQueue = new Queue();
+	const targetQueue = new Queue();
+	sourceQueue.push(start);
+	targetQueue.push(end);
+	const visitedNodes = [];
+	const source = new Set();
+	const target = new Set();
+	source.add(start);
+	target.add(end);
+	while(!sourceQueue.isEmpty() && !targetQueue.isEmpty()){
+		const currSource = sourceQueue.front();
+		sourceQueue.pop();
+		// console.log('currSource ',currSource);
+		if(target.has(currSource)){
+			source.add(currSource)
+			console.log('Source Set=> ', source)
+			console.log('Target Set=> ', target)
+			visitedNodes.push(currSource);
+			return visitedNodes;
+		}
+		const currTarget = targetQueue.front();
+		targetQueue.pop();
+		// console.log('currTarget ',currTarget);
+		if(source.has(currTarget)){
+			target.add(currTarget);
+			console.log('Source Set=> ', source)
+			console.log('Taget Set=> ', target)
+			visitedNodes.push(currTarget);
+			return visitedNodes;
+		}
+		if(!currSource.visited && !currSource.isWall){
+			currSource.visited = true;
+			visitedNodes.push(currSource);
+			source.add(currSource);
+			if(currSource === end)
+				return visitedNodes;
+			for(let i=0;i<dx.length;i++){
+				const x = currSource.row + dx[i];
+				const y = currSource.col + dy[i];
+				if(!isValid(grid, x, y))
+					continue;
+				const next = grid[x][y];
+				if(target.has(next)){
+					next.prev = currSource;
+					source.add(next);
+					console.log('Source Set=> ', source)
+					console.log('Taget Set=> ', target)
+					visitedNodes.push(next);
+					return visitedNodes;
+				}
+				if(next.visited || next.isWall)
+					continue;
+				next.prev = currSource;
+				sourceQueue.push(next);
+			}
+		}
+
+		if(!currTarget.visited && !currTarget.isWall){
+			currTarget.visited = true;
+			visitedNodes.push(currTarget);
+			target.add(currTarget);
+			if(currTarget === start)
+				return visitedNodes;
+			for(let i=dx.length-1;i>=0;i--){
+				const x = currTarget.row + dx[i];
+				const y = currTarget.col + dy[i];
+				if(!isValid(grid, x, y))
+					continue;
+				const next = grid[x][y];
+				if(source.has(next)){
+					next.prev = currTarget;
+					target.add(next);
+					console.log('Source Set=> ', source)
+					console.log('Taget Set=> ', target)
+					visitedNodes.push(next);
+					return visitedNodes;
+				}
+				if(next.visited || next.isWall)
+					continue;
+				next.prev = currTarget;
+				targetQueue.push(next);
+			}
+		}
+	}
+	return visitedNodes;
+}
 
 function GreedyBFS(grid, start, end) {
 	start.distance = 0;

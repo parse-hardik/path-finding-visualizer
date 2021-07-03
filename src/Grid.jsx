@@ -89,9 +89,23 @@ export default class PathFinder extends Component {
     const allNodes = Algo(grid, start, end, this.state.algorithm);
     const last = allNodes[allNodes.length - 1];
     console.log(allNodes);
-    const shortestPath = getShortestPath(allNodes, start);
-    console.log(shortestPath);
-    this.animateAlgorithm(allNodes, shortestPath, last);
+    if(this.state.algorithm === 'BiBFS'){
+      console.log('Last ', last)
+      this.clearPath();
+      const al1 = Algo(grid, start, last, 'BFS');
+      const sp1 = getShortestPath(al1, start);
+      this.clearPath();
+      const al2 = Algo(grid, last, end, 'BFS');
+      const sp2 = getShortestPath(al2, last);
+      const shortestPath = sp1.concat(sp2);
+      this.animateAlgorithm(allNodes, shortestPath, end);
+    }
+    else{
+      const shortestPath = getShortestPath(allNodes, start);
+      console.log(shortestPath);
+      // const shortestPath = [];
+      this.animateAlgorithm(allNodes, shortestPath, last);
+    }
   }
 
   clearBoard() {
@@ -244,6 +258,7 @@ export default class PathFinder extends Component {
     if (this.state.algorithm === "BFS") return "BFS!";
     if (this.state.algorithm === "DFS") return "DFS!";
     if (this.state.algorithm === "GBFS") return "Greedy BFS!";
+    if (this.state.algorithm === "BiBFS") return "Bidirectional BFS!";
   }
 
   render() {
@@ -309,6 +324,13 @@ export default class PathFinder extends Component {
                     onClick={() => this.setAlgo("GBFS")}
                   >
                     Greedy Best First
+                  </a>
+                  <a
+                    class="dropdown-item cwhite"
+                    href="#"
+                    onClick={() => this.setAlgo("BiBFS")}
+                  >
+                    Bidirectional BFS
                   </a>
                 </div>
               </li>
